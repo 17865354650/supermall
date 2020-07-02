@@ -62,7 +62,6 @@
             },
             // 重新刷新，获取高度
             refresh(){
-                console.log('---')
                 this.scroll && this.scroll.refresh()
             }
         }

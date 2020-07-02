@@ -1,7 +1,7 @@
 <template>
     <div id="home">
         <NavBar class="home-nav"><div slot="center">首页</div></NavBar>
-        <!-- 四个圆形导航 -->
+        <TabControl ref="tabControl1" :titles="['流行','新款','精选']" @tabClick="changGoods" class="tabControl1" v-show="this.isShowTabControl"/>
         <Scroll 
             class="content" 
             ref="scroll" 
@@ -9,8 +9,9 @@
             @scrollClick="getPosition"
             :pull-up-load="true"
             @upload="loadMore">
-            <RecommendView :recommend="recommend" />
-            <TabControl class="tabControl" :titles="['流行','新款','精选']" @tabClick="changGoods" />
+             <!-- 四个圆形导航 -->
+            <RecommendView :recommend="recommend" @recommdImgUpload="recommdImgUpload" />
+            <TabControl ref="tabControl2" :titles="['流行','新款','精选']" @tabClick="changGoods" />
             <GoodsList :goodsData="showGoods" />
         </Scroll> 
         <!--组件不能直接监听点击 -->
@@ -29,6 +30,8 @@
     import RecommendView from './childComps/homeRecommendView'
 
     import { getHomeMultidata, getHomeGoods } from 'network/home.js'
+    import { debounce } from "common/utils.js"
+
     export default {
         components:{
             NavBar,
@@ -49,7 +52,9 @@
                     'sell':{list:[],page:0}
                 },
                 currentType:'pop',
-                isShowBackTop:false
+                isShowBackTop:false,
+                tabOffsetTop:0,
+                isShowTabControl:false
             }
         },
         // 组件创建完执行
@@ -68,11 +73,14 @@
                 通过图片加载完成后的，刷新重新获取高度解决此问题
                 GoodsListItem bus总线 发送过来事件
             */ 
-            //使用防抖函数      
-            const refresh = this.debounce(this.$refs.scroll.refresh,200)
+            //使用防抖函数  this.$refs.scroll.refresh:拿到scroll的函数
+            const refresh = debounce(this.$refs.scroll.refresh,200)
             this.$bus.$on('imgUpload',()=>{
                 refresh()
             })
+
+            
+            
         },
         methods: {
             /*
@@ -111,27 +119,27 @@
                         this.currentType = "sell"
                         break
                 }
+                // this.$refs.tabControl.currentIndex 这个拿的是（tabControl）组件里data定义的变量currentIndex
+                this.$refs.tabControl1.currentIndex = index;
+                this.$refs.tabControl2.currentIndex = index
             },
             backClick(){
                 // this.$refs.scroll：拿到这个组件 后面是里面的方法
                 this.$refs.scroll.scrollTo(0,0,500)
             },
             getPosition(position){
-                this.isShowBackTop = (-position.y) > 1000
+                this.isShowBackTop = (-position.y) > 1000;
+                this.isShowTabControl = (-position.y) > this.tabOffsetTop
             },
             // 上拉加载更多
             loadMore(){
                 this.getHomeGoods(this.currentType)
             },
-            // 防抖函数
-            debounce(func,delay){
-                let timer = null;
-                return function(...args){
-                    if(timer) clearTimeout(timer)
-                    timer = setTimeout(()=>{
-                        func.apply(this, args)
-                    }, delay)
-                }
+            // 他这个获取的高度要等图片加载完成后再去获取高度
+            recommdImgUpload(){
+                // 获取tabCotrol的offsetTop
+                //所有的组件都有一个 $el:用于获取组件中的元素
+                this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
             }
         },
         // 当在上面展示的过长时，通过计算属性简化
@@ -153,11 +161,6 @@
         background: var(--color-tint);
         color:#fff;
     }
-    .tabControl{
-        background: #fff;
-        position:sticky;
-        top:44px;
-    }
     .content{
         /* height:calc(100% -93px);
         margin-top:44px; */
@@ -168,5 +171,11 @@
         bottom: 49px;
         left:0;
         right: 0;
+    }
+    .tabControl1{
+        background:#fff;
+        /* z-index属性适用于定位元素：加psoition才能在上面 */
+        position: relative; 
+        z-index: 100
     }
 </style>

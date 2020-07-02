@@ -2,7 +2,7 @@
     <div class="recommend">
         <div v-for="(item,index) in recommend" :key="index" class="recommend-item">
             <a :href="item.link">
-                <img :src="item.image" alt="">
+                <img :src="item.image" alt="" @load="imgRecommd">
                 <div>{{item.title}}</div>
             </a>
         </div>
@@ -11,11 +11,24 @@
 
 <script>
     export default {
+        data(){
+            return{
+                isLoad:false
+            }
+        },
         props:{
             recommend: {
                 type:Array,
                 default(){
                     return []
+                }
+            }
+        },
+        methods: {
+            imgRecommd(){
+                if(!this.isLoad){
+                    this.$emit('recommdImgUpload')
+                    this.isLoad = true //防止多次发送
                 }
             }
         }

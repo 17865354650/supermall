@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <!-- 防止销毁重新创建 exclude 去除哪些（name）需要二次进入时需要重新加载-->
+    <keep-alive exclude="detail">
+      <router-view></router-view>
+    </keep-alive>
     <TabBar>
       <TabBarItem path="/home" activeColor="red">
         <img slot="item-icon" src="~assets/img/common/home1.png" alt />

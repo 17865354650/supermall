@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 const Home = () => import('../views/home/home')
 const My = () => import('../views/my/my')
 const Cart = () => import('../views/cart/cart')
+const Detail = () => import('../views/detail/detail')
 Vue.use(VueRouter)
 
 const routes = [
@@ -22,6 +23,10 @@ const routes = [
     {
         path:'/cart',
         component:Cart
+    },
+    {
+        path:'/detail',
+        component:Detail
     }
 ]
 

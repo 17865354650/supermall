@@ -25,8 +25,8 @@
         display: flex;
         box-shadow: 0px 1px 1px rgba(100, 100, 100, .1);
         text-align: center;
-        position: fixed;
-        top:0;left:0;
+        /* position: fixed;
+        top:0;left:0; */
         z-index: 10;
     }
     .left,.right{

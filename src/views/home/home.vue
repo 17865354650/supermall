@@ -30,7 +30,8 @@
     import RecommendView from './childComps/homeRecommendView'
 
     import { getHomeMultidata, getHomeGoods } from 'network/home.js'
-    import { debounce } from "common/utils.js"
+    
+    import { itemListenerMixin } from "common/mixin.js"
 
     export default {
         components:{
@@ -41,6 +42,7 @@
             Scroll,
             BackTop
         },
+        mixins:[itemListenerMixin],
         data(){
             return {
                 result:'',
@@ -54,7 +56,8 @@
                 currentType:'pop',
                 isShowBackTop:false,
                 tabOffsetTop:0,
-                isShowTabControl:false
+                isShowTabControl:false,
+                saveY:0,
             }
         },
         // 组件创建完执行
@@ -68,19 +71,7 @@
 
         },
         mounted(){
-            /*
-                为了解决图片加载过慢导致better-scroll获取高度不正确
-                通过图片加载完成后的，刷新重新获取高度解决此问题
-                GoodsListItem bus总线 发送过来事件
-            */ 
-            //使用防抖函数  this.$refs.scroll.refresh:拿到scroll的函数
-            const refresh = debounce(this.$refs.scroll.refresh,200)
-            this.$bus.$on('imgUpload',()=>{
-                refresh()
-            })
-
-            
-            
+           
         },
         methods: {
             /*
@@ -147,13 +138,26 @@
             showGoods(){
                 return this.goods[this.currentType].list
             }
+        },
+
+        // 当使用keepAlive后组件里可以使用他两，离开和进入组件触发的生命周期
+        activated(){
+            this.$refs.scroll.scrollTo(0,this.saveY,0)
+            this.$refs.scroll.refresh(); //有时候会出现bug，刷新即可解决
+        },
+        deactivated(){
+            // 保存y值
+            this.saveY = this.$refs.scroll.getScrollY()
+
+            // 取消全局事件的监听
+            this.$bus.$off('imgUpload',this.itemImgListener)
         }
     }
 </script>
 
 <style scoped>
     #home{
-        padding-top:44px;
+        /* padding-top:44px; */
         height: 100vh;
         position: relative;
     }

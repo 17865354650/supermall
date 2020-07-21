@@ -63,6 +63,10 @@
             // 重新刷新，获取高度
             refresh(){
                 this.scroll && this.scroll.refresh()
+            },
+            // 获取y
+            getScrollY(){
+                return this.scroll ? this.scroll.y : 0
             }
         }
     }

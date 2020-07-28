@@ -1,136 +1,112 @@
 <template>
-    <div class="wrapper">
-        <ul>
-            <li>商品列表1</li>
-            <li>商品列表2</li>
-            <li>商品列表3</li>
-            <li>商品列表4</li>
-            <li>商品列表5</li>
-            <li>商品列表6</li>
-            <li>商品列表7</li>
-            <li>商品列表8</li>
-            <li>商品列表9</li>
-            <li>商品列表10</li>
-            <li>商品列表11</li>
-            <li>商品列表12</li>
-            <li>商品列表13</li>
-            <li>商品列表14</li>
-            <li>商品列表15</li>
-            <li>商品列表16</li>
-            <li>商品列表17</li>
-            <li>商品列表18</li>
-            <li>商品列表19</li>
-            <li>商品列表20</li>
-            <li>商品列表21</li>
-            <li>商品列表22</li>
-            <li>商品列表23</li>
-            <li>商品列表24</li>
-            <li>商品列表25</li>
-            <li>商品列表26</li>
-            <li>商品列表27</li>
-            <li>商品列表28</li>
-            <li>商品列表29</li>
-            <li>商品列表30</li>
-            <li>商品列表31</li>
-            <li>商品列表32</li>
-            <li>商品列表33</li>
-            <li>商品列表34</li>
-            <li>商品列表35</li>
-            <li>商品列表36</li>
-            <li>商品列表37</li>
-            <li>商品列表38</li>
-            <li>商品列表39</li>
-            <li>商品列表40</li>
-            <li>商品列表41</li>
-            <li>商品列表42</li>
-            <li>商品列表43</li>
-            <li>商品列表44</li>
-            <li>商品列表45</li>
-            <li>商品列表46</li>
-            <li>商品列表47</li>
-            <li>商品列表48</li>
-            <li>商品列表49</li>
-            <li>商品列表50</li>
-            <li>商品列表51</li>
-            <li>商品列表52</li>
-            <li>商品列表53</li>
-            <li>商品列表54</li>
-            <li>商品列表55</li>
-            <li>商品列表56</li>
-            <li>商品列表57</li>
-            <li>商品列表58</li>
-            <li>商品列表59</li>
-            <li>商品列表60</li>
-            <li>商品列表61</li>
-            <li>商品列表62</li>
-            <li>商品列表63</li>
-            <li>商品列表64</li>
-            <li>商品列表65</li>
-            <li>商品列表66</li>
-            <li>商品列表67</li>
-            <li>商品列表68</li>
-            <li>商品列表69</li>
-            <li>商品列表70</li>
-            <li>商品列表71</li>
-            <li>商品列表72</li>
-            <li>商品列表73</li>
-            <li>商品列表74</li>
-            <li>商品列表75</li>
-            <li>商品列表76</li>
-            <li>商品列表77</li>
-            <li>商品列表78</li>
-            <li>商品列表79</li>
-            <li>商品列表80</li>
-            <li>商品列表81</li>
-            <li>商品列表82</li>
-            <li>商品列表83</li>
-            <li>商品列表84</li>
-            <li>商品列表85</li>
-            <li>商品列表86</li>
-            <li>商品列表87</li>
-            <li>商品列表88</li>
-            <li>商品列表89</li>
-            <li>商品列表90</li>
-            <li>商品列表91</li>
-            <li>商品列表92</li>
-            <li>商品列表93</li>
-            <li>商品列表94</li>
-            <li>商品列表95</li>
-            <li>商品列表96</li>
-            <li>商品列表97</li>
-            <li>商品列表98</li>
-            <li>商品列表99</li>
-            <li>商品列表100</li>
-        </ul>
+    <div class='cart'>
+        <NavBar class="cart-nav"><div slot="center">购物车({{length}})</div></NavBar>
+        <Scroll class="cartContent" ref="cart">
+            <ItemList/>
+        </Scroll>
+        <div class="cartBot">
+            <div class="checkout" :class="{isActive:isSellectAll}" @click="itemClick()"></div>全选
+            <span style="margin-left:20px;">总计：{{totalPrice}}</span>
+            <span style="margin-left:50px;">去计算（{{goodsNum}}）</span>
+        </div>
     </div>
 </template>
-
 <script>
-    import Bscroll from "better-scroll";
-    export default {
-        mounted(){
-            let bs = new Bscroll('.wrapper',{
-                probeType:3,
-                pullUpLoad:true
-            })
-            bs.on('scroll',position=>{
-                // console.log(position)
-            })
-            bs.on('pullingUp',()=>{
-                console.log('上啦加载更多')
+    import NavBar from 'components/common/navbar/NavBar'
+    import Scroll from "components/common/scroll/Scroll"
 
-                setTimeout(()=>{
-                    bs.finishPullUp() //要想再次触发上啦加载，必须调用此函数
-                },3000)
-            })
+    import ItemList from "./childComps/itemList"
+
+    //辅助函数mapGetter 仅仅是将getters 映射到局部计算属性中
+    import { mapGetters } from "vuex" 
+
+    export default {
+        components:{
+            NavBar,
+            ItemList,
+            Scroll
+        },
+        activated(){
+             //数据更新了需要刷新
+            this.$refs.cart.refresh()
+        },
+        methods:{
+            itemClick(){
+                //1、当全选中
+                if(this.isSellectAll){
+                    this.cartList.forEach(element => {
+                        element.checked = false
+                    });
+                }else{ //有一个未选中，或都未选中
+                    this.cartList.forEach(element => {
+                        element.checked = true
+                    })
+                }
+            }
+        },
+        computed:{
+            // 拿到vuex中定义的函数（写法一）
+            // ...mapGetters(['cartLength'])
+            // 写法二
+            ...mapGetters({
+                length:'cartLength',
+                cartList:'cartList'
+            }),
+            // 求和
+            totalPrice(){
+                return '¥' + this.cartList.filter(item=>{ //筛选
+                    return item.checked
+                }).reduce((preValue,item) => { //preValue:上一个值，item：当前值（求和）
+                    return preValue + item.price * item.count
+                },0).toFixed(2) //0:初始值
+            },
+            // 商品个数
+            goodsNum(){
+                return this.cartList.filter(item=>{ //筛选
+                    return item.checked
+                }).reduce((preValue,item) => { //preValue:上一个值，item：当前值（求和）
+                    return preValue + item.count
+                },0)
+            },
+            // 判断是否全选
+            isSellectAll(){
+                if(this.cartList.length === 0){
+                    return false
+                }
+                return !this.cartList.find(item=> !item.checked)
+            }
         }
     }
 </script>
-
 <style scoped>
-    .wrapper{
-        height:200px;
-        background: orange;
-        overflow: hidden;
-    }
+.cart-nav{
+    background:var(--color-tint);
+    color:#fff;
+}
+.cart{
+    position: relative;
+}
+.cartContent{
+    height: calc(100vh - 93px - 40px);
+    overflow: hidden;
+}
+.cartBot{
+    height:40px;
+    width:100%;
+    background: yellowgreen;
+    position:absolute;
+    bottom:-40px;
+    left:0;
+    display: flex;
+    align-items: center;
+}
+.checkout{
+    height:20px;
+    width:20px;
+    border:1px solid red;
+    border-radius:50%;
+}
+.isActive{
+    background:orange;
+}
 </style>

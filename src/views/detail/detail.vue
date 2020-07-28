@@ -128,6 +128,8 @@
 
             this.isShowBackTop = (-position.y) > 1000;
          },
+
+         // 将商品添加到购物车里（使用vuex）
          addCart(){
             const product = {}
             product.image = this.topImg;
@@ -135,7 +137,8 @@
             product.price = this.goods.realPrice
             product.iid = this.iid
 
-            console.log(product)
+            // this.$store.commit('addGoods',product)  //mutations 触发方法
+            this.$store.dispatch('addGoods',product)
          }
       },
       computed: {

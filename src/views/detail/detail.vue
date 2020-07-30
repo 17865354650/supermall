@@ -41,6 +41,7 @@
    import { itemListenerMixin , backTopMixin} from "common/mixin.js"
    import {debounce} from 'common/utils';
 
+   import {mapActions} from "vuex"
    export default {
       name:"detail",
       components:{
@@ -78,6 +79,7 @@
          })
       },
       methods:{
+         ...mapActions(['addGoods']),
          getDetail(iid){
             getDetail(iid).then(res=>{
                const data = res.result
@@ -138,7 +140,10 @@
             product.iid = this.iid
 
             // this.$store.commit('addGoods',product)  //mutations 触发方法
-            this.$store.dispatch('addGoods',product)
+            // 普通的调用
+            // this.$store.dispatch('addGoods',product)
+            // 通过辅助函数mapActions 调用
+            this.addGoods(product)
          }
       },
       computed: {

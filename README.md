@@ -1,5 +1,5 @@
 # supermall
- ceshi 
+ ceshi  删除了测试
 ## Project setup
 ```
 npm install
